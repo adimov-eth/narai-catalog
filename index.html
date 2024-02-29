@@ -17,16 +17,47 @@
   <h1 class="text-2xl font-bold my-4">Avve Bar</h1>
   <a href="https://instagram.com" class="bg-red-700 text-white py-2 px-4 rounded-full my-2 w-full text-center">Instagram</a>
   <a href="/menu" class="bg-red-700 text-white py-2 px-4 rounded-full my-2 w-full text-center">Menu</a>
-  <!-- Copy button and feedback message for BTC -->
-  <div class="flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full relative">
+  <!-- Address fields with copy buttons and feedback messages -->
+  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
     <span class="mr-2">BTC:</span>
     <input type="text" value="1BoatSLRHtKNngkdXEeobR76b53LETtpyT" class="bg-transparent text-center flex-1 text-white" readonly>
     <button class="copy-btn" data-address="1BoatSLRHtKNngkdXEeobR76b53LETtpyT">
       <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
     </button>
-    <span class="copy-feedback absolute -bottom-10 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
+    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
   </div>
-  <!-- Add more cryptocurrency address fields here with the same structure, including feedback messages -->
+  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
+    <span class="mr-2">ETH:</span>
+    <input type="text" value="0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe" class="bg-transparent text-center flex-1 text-white" readonly>
+    <button class="copy-btn" data-address="0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe">
+      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
+    </button>
+    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
+  </div>
+  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
+    <span class="mr-2">TRX:</span>
+    <input type="text" value="TJjyQ2WRRhnPfLTRuFZ5vMdN2wvhP4vCWq" class="bg-transparent text-center flex-1 text-white" readonly>
+    <button class="copy-btn" data-address="TJjyQ2WRRhnPfLTRuFZ5vMdN2wvhP4vCWq">
+      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
+    </button>
+    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
+  </div>
+  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
+    <span class="mr-2">TON:</span>
+    <input type="text" value="EQCf3w9RgRfCFHhMQ8sz1smC1veBRa3xJbhcFw9mzKBCmgmg" class="bg-transparent text-center flex-1 text-white" readonly>
+    <button class="copy-btn" data-address="EQCf3w9RgRfCFHhMQ8sz1smC1veBRa3xJbhcFw9mzKBCmgmg">
+      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
+    </button>
+    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
+  </div>
+  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
+    <span class="mr-2">BEP:</span>
+    <input type="text" value="0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B" class="bg-transparent text-center flex-1 text-white" readonly>
+    <button class="copy-btn" data-address="0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B">
+      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
+    </button>
+    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
+  </div>
 </div>
 <script>
   document.querySelectorAll('.copy-btn').forEach(button => {
