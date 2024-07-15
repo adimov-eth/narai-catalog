@@ -316,7 +316,7 @@
             score = 0;
             itemCount = 0;
             totalTime = 0;
-            timeLeft = Math.floor(Math.random() * (128 - 16 + 1)) + 16;
+            timeLeft = (Math.floor(Math.random() * (128 - 16 + 1)) + 16 ) * 10;
             scoreElement.textContent = `Score: ${score}`;
             timeElement.textContent = `Time: ${timeLeft}s`;
             itemCountElement.textContent = `Items: ${itemCount}/3`;
@@ -345,7 +345,7 @@
                         if (dx * dx + dy * dy < portal.radius * portal.radius) {
                             score += 5;
                             itemCount = 0;
-                            timeLeft = Math.floor(Math.random() * (128 - 16 + 1)) + 16;
+                            timeLeft = (Math.floor(Math.random() * (128 - 16 + 1)) + 16) * 10;
                             scoreElement.textContent = `Score: ${score}`;
                             timeElement.textContent = `Time: ${timeLeft}s`;
                             itemCountElement.textContent = `Items: ${itemCount}/3`;
