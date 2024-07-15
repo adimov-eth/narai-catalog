@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Interdimensional Chaos</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e;
+            color: #16f9af;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            touch-action: none;
+        }
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #startScreen, #gameOverScreen, #tutorialScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(26, 26, 46, 0.9);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #f72585;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        #score, #time, #itemCount {
+            position: absolute;
+            font-size: 18px;
+        }
+        #score { top: 10px; left: 10px; }
+        #time { top: 10px; right: 10px; }
+        #itemCount { top: 40px; left: 10px; }
+        #dialogue {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            font-size: 16px;
+            background-color: rgba(26, 26, 46, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #tutorialScreen {
+            text-align: center;
+        }
+        #tutorialScreen p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="score">Score: 0</div>
+    <div id="time">Time: 60s</div>
+    <div id="itemCount">Items: 0/3</div>
+    <div id="dialogue"></div>
+    <div id="startScreen">
+        <h1>Interdimensional Chaos</h1>
+        <button id="startButton">Start Adventure</button>
+    </div>
+    <div id="tutorialScreen" style="display: none;">
+        <h1>How to Play</h1>
+        <p>1. Tap on glowing items to collect them (+10 points)</p>
+        <p>2. Collect 3 items to activate portals</p>
+        <p>3. Tap on active portals to travel (+5 points and reset timer)</p>
+        <p>4. Avoid the bouncing creatures!</p>
+        <p>5. Survive as long as you can!</p>
+        <button id="tutorialButton">Got it, let's go!</button>
+    </div>
+    <div id="gameOverScreen" style="display: none;">
+        <h1>Reality Collapsed!</h1>
+        <p id="finalScore"></p>
+        <p id="totalTime"></p>
+        <button id="restartButton">Try Another Reality</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const tutorialScreen = document.getElementById('tutorialScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startButton = document.getElementById('startButton');
+        const tutorialButton = document.getElementById('tutorialButton');
+        const restartButton = document.getElementById('restartButton');
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('time');
+        const itemCountElement = document.getElementById('itemCount');
+        const dialogueElement = document.getElementById('dialogue');
+        const finalScoreElement = document.getElementById('finalScore');
+        const totalTimeElement = document.getElementById('totalTime');
+
+        let score, timeLeft, gameLoop, itemCount, totalTime;
+        let gameActive = false;
+        let portals = [];
+        let creatures = [];
+        let items = [];
+
+        const dialogues = [
+            "Oh geez, what dimension are we in now?",
+            "That creature looks suspiciously like my math teacher...",
+            "Is that portal supposed to be that color?",
+            "I think I just saw myself walk by. Twice.",
+            "Why does everything smell like burnt toast here?",
+            "I'm pretty sure that rock just winked at me.",
+            "Is it normal for gravity to change every 5 seconds?",
+            "I don't remember having three arms this morning.",
+            "That sandwich is definitely plotting something.",
+            "I swear that cloud just asked me for directions."
+        ];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Portal {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = 30;
+                this.color = color;
+                this.angle = 0;
+                this.active = false;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.beginPath();
+                for (let i = 0; i < 8; i++) {
+                    ctx.rotate(Math.PI / 4);
+                    ctx.quadraticCurveTo(this.radius / 2, this.radius / 2, this.radius, 0);
+                }
+                ctx.fillStyle = this.active ? this.color : '#888';
+                ctx.fill();
+                ctx.restore();
+
+                // Draw a pulsing glow
+                if (this.active) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius + 5 + Math.sin(Date.now() / 200) * 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.1 + Math.sin(Date.now() / 200) * 0.05})`;
+                    ctx.fill();
+                }
+
+                this.angle += 0.05;
+            }
+        }
+
+        class Creature {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 15;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.speedY = (Math.random() - 0.5) * 2;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+
+                // Draw eyes
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x - 5, this.y - 5, 3, 0, Math.PI * 2);
+                ctx.arc(this.x + 5, this.y - 5, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            move() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < this.radius || this.x > canvas.width - this.radius) {
+                    this.speedX = -this.speedX;
+                }
+                if (this.y < this.radius || this.y > canvas.height - this.radius) {
+                    this.speedY = -this.speedY;
+                }
+            }
+        }
+
+        class Item {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 20;
+                this.height = 20;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.glowIntensity = 0;
+            }
+
+            draw() {
+                // Draw glow
+                ctx.beginPath();
+                ctx.rect(this.x - this.width / 2 - 5, this.y - this.height / 2 - 5, this.width + 10, this.height + 10);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.2 + this.glowIntensity})`;
+                ctx.fill();
+
+                // Draw item
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+
+                // Update glow
+                this.glowIntensity = 0.2 + Math.sin(Date.now() / 200) * 0.1;
+            }
+        }
+
+        function createLevel() {
+            portals = [];
+            creatures = [];
+            items = [];
+
+            // Create portals
+            for (let i = 0; i < 3; i++) {
+                portals.push(new Portal(
+                    Math.random() * (canvas.width - 60) + 30,
+                    Math.random() * (canvas.height - 60) + 30,
+                    `hsl(${Math.random() * 360}, 100%, 50%)`
+                ));
+            }
+
+            // Create creatures
+            for (let i = 0; i < 5; i++) {
+                creatures.push(new Creature(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                ));
+            }
+
+            // Create items
+            for (let i = 0; i < 5; i++) {
+                items.push(new Item(
+                    Math.random() * (canvas.width - 20) + 10,
+                    Math.random() * (canvas.height - 20) + 10
+                ));
+            }
+
+            updatePortalStatus();
+        }
+
+        function updatePortalStatus() {
+            portals.forEach(portal => portal.active = itemCount >= 3);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            portals.forEach(portal => portal.draw());
+            creatures.forEach(creature => creature.draw());
+            items.forEach(item => item.draw());
+        }
+
+        function update() {
+            if (!gameActive) return;
+
+            creatures.forEach(creature => creature.move());
+
+            if (timeLeft <= 0) {
+                gameOver();
+                return;
+            }
+
+            timeLeft--;
+            totalTime++;
+            timeElement.textContent = `Time: ${timeLeft}s`;
+
+            if (totalTime % 10 === 0) {
+                dialogueElement.textContent = dialogues[Math.floor(Math.random() * dialogues.length)];
+            }
+
+            draw();
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            tutorialScreen.style.display = 'flex';
+        }
+
+        function startGameAfterTutorial() {
+            gameActive = true;
+            tutorialScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            score = 0;
+            itemCount = 0;
+            totalTime = 0;
+            timeLeft = Math.floor(Math.random() * (128 - 16 + 1)) + 16;
+            scoreElement.textContent = `Score: ${score}`;
+            timeElement.textContent = `Time: ${timeLeft}s`;
+            itemCountElement.textContent = `Items: ${itemCount}/3`;
+            createLevel();
+            gameLoop = requestAnimationFrame(update);
+        }
+
+        function gameOver() {
+            gameActive = false;
+            cancelAnimationFrame(gameLoop);
+            gameOverScreen.style.display = 'flex';
+            finalScoreElement.textContent = `Final Score: ${score}`;
+            totalTimeElement.textContent = `Total Time Survived: ${totalTime} seconds`;
+        }
+
+        function handleInteraction(x, y) {
+            if (!gameActive) return;
+
+            let portalUsed = false;
+
+            if (itemCount >= 3) {
+                portals.forEach(portal => {
+                    if (portal.active) {
+                        const dx = x - portal.x;
+                        const dy = y - portal.y;
+                        if (dx * dx + dy * dy < portal.radius * portal.radius) {
+                            score += 5;
+                            itemCount = 0;
+                            timeLeft = Math.floor(Math.random() * (128 - 16 + 1)) + 16;
+                            scoreElement.textContent = `Score: ${score}`;
+                            timeElement.textContent = `Time: ${timeLeft}s`;
+                            itemCountElement.textContent = `Items: ${itemCount}/3`;
+                            createLevel();
+                            showFeedback(x, y, "+5", "#f72585");
+                            portalUsed = true;
+                        }
+                    }
+                });
+            }
+
+            if (!portalUsed) {
+                items = items.filter((item, index) => {
+                    if (x > item.x - item.width / 2 && x < item.x + item.width / 2 &&
+                        y > item.y - item.height / 2 && y < item.y + item.height / 2) {
+                        score += 10;
+                        itemCount++;
+                        scoreElement.textContent = `Score: ${score}`;
+                        itemCountElement.textContent = `Items: ${itemCount}/3`;
+                        showFeedback(x, y, "+10", "#4cc9f0");
+                        updatePortalStatus();
+                        return false;
+                    }
+                    return true;
+                });
+            }
+        }
+
+        function showFeedback(x, y, text, color) {
+            ctx.font = "bold 20px Arial";
+            ctx.fillStyle = color;
+            ctx.textAlign = "center";
+            ctx.fillText(text, x, y - 20);
+        }
+
+        startButton.addEventListener('click', startGame);
+        tutorialButton.addEventListener('click', startGameAfterTutorial);
+        restartButton.addEventListener('click', startGameAfterTutorial);
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            handleInteraction(x, y);
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+ 
+        handleInteraction(x, y);
+    }, { passive: false });
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Initial game setup
+    createLevel();
+    dialogueElement.textContent = dialogues[Math.floor(Math.random() * dialogues.length)];
+</script>
+</body>
+</html>
