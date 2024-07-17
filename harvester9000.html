@@ -10,13 +10,32 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @font-face {
+            font-family: 'SF-Pro';
+            src: url('https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff');
+        }
         body {
+            font-family: 'SF-Pro', sans-serif;
             background-color: #1E1E1E;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23383838' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
+        .game-card {
+            background-color: #2C2C2E;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .game-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .bottom-nav {
+            background-color: #1C1C1E;
+            border-top: 1px solid #383838;
+        }
     </style>
 </head>
-<body class="text-gray-200">
+<body class="text-white">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -26,84 +45,72 @@
                 name: "Clicker Adventure",
                 description: "Click your way to riches!",
                 deepLink: "https://t.me/ClickerAdventureBot/play",
-                interval: 60 // minutes
+                interval: 60, // minutes
+                image: "https://picsum.photos/seed/game1/300/200"
             },
             game2: {
                 name: "Token Farmer",
                 description: "Grow and harvest tokens",
                 deepLink: "https://t.me/TokenFarmerBot/play",
-                interval: 120 // minutes
+                interval: 120, // minutes
+                image: "https://picsum.photos/seed/game2/300/200"
             },
             game3: {
                 name: "Crypto Miner",
                 description: "Mine virtual cryptocurrencies",
                 deepLink: "https://t.me/CryptoMinerBot/play",
-                interval: 180 // minutes
+                interval: 180, // minutes
+                image: "https://picsum.photos/seed/game3/300/200"
             },
             game4: {
                 name: "Idle Empire",
                 description: "Build your idle empire",
                 deepLink: "https://t.me/IdleEmpireBot/play",
-                interval: 240 // minutes
+                interval: 240, // minutes
+                image: "https://picsum.photos/seed/game4/300/200"
             },
             game5: {
                 name: "Tap Tycoon",
                 description: "Become a tapping tycoon",
                 deepLink: "https://t.me/TapTycoonBot/play",
-                interval: 90 // minutes
+                interval: 90, // minutes
+                image: "https://picsum.photos/seed/game5/300/200"
             }
         };
 
-        // Custom hook for timer (unchanged)
-        const useTimer = (initialTime) => {
-            const [timeRemaining, setTimeRemaining] = React.useState(initialTime);
-
-            React.useEffect(() => {
-                const timer = setInterval(() => {
-                    setTimeRemaining((prevTime) => {
-                        if (prevTime <= 0) {
-                            return initialTime;
-                        }
-                        return prevTime - 1;
-                    });
-                }, 1000);
-
-                return () => clearInterval(timer);
-            }, [initialTime]);
-
-            return timeRemaining;
-        };
-
-        // TON Crystal Icon component (unchanged)
-        const TonCrystalIcon = () => (
-            <svg className="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#36BBFF" />
-                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#36BBFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        // Telegram Icon component (unchanged)
+        const TelegramIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.6527 3.32854C19.6527 3.32854 21.6571 2.53497 21.49 4.46221C21.4344 5.2558 20.9333 8.03329 20.5436 11.0375L19.2073 19.9369C19.2073 19.9369 19.096 21.2406 18.0938 21.4674C17.0916 21.6941 15.5884 20.6738 15.31 20.447C15.0873 20.277 11.1344 17.7262 9.74246 16.4792C9.35271 16.1391 8.90731 15.4589 9.79812 14.6653L15.6441 8.99694C16.3122 8.31673 16.9803 6.72958 14.1965 8.65684L6.40192 14.0418C6.40192 14.0418 5.51111 14.6086 3.84087 14.0985L0.221922 12.9648C0.221922 12.9648 -1.1143 12.1146 1.16841 11.2643C6.736 8.60011 13.5841 5.87929 19.6527 3.32854Z" fill="white"/>
             </svg>
         );
 
         // GameCard component (unchanged)
         const GameCard = ({ game }) => {
-            const timeRemaining = useTimer(game.interval * 60);
-
             const handleOpenGame = () => {
                 window.Telegram.WebApp.openTelegramLink(game.deepLink);
             };
 
             return (
-                <div className="bg-gray-800 rounded-lg shadow-lg p-4 transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-750">
-                    <h2 className="text-lg font-bold mb-2 text-blue-300">{game.name}</h2>
-                    <p className="text-sm text-gray-400 mb-3">{game.description}</p>
-                    <p className="text-sm font-semibold mb-3 text-blue-400">
-                        <TonCrystalIcon />
-                        Time remaining: {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
-                    </p>
-                    <button
-                        onClick={handleOpenGame}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
-                    >
-                        Open Game
-                    </button>
+                <div className="game-card mb-4">
+                    <img src={game.image} alt={game.name} />
+                    <div className="p-4">
+                        <h2 className="text-xl font-bold mb-2">{game.name}</h2>
+                        <p className="text-sm text-gray-400 mb-4">{game.description}</p>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center">
+                                <div className="bg-gray-700 p-2 rounded-full mr-2">
+                                    <TelegramIcon />
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleOpenGame}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold"
+                            >
+                                Open Game
+                            </button>
+                        </div>
+                    </div>
                 </div>
             );
         };
@@ -111,7 +118,7 @@
         // GameGrid component (unchanged)
         const GameGrid = ({ games }) => {
             return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     {Object.entries(games).map(([key, game]) => (
                         <GameCard key={key} game={game} />
                     ))}
@@ -119,21 +126,52 @@
             );
         };
 
-        // Header component (updated with new app name)
+        // Header component (unchanged)
         const Header = () => {
             return (
-                <header className="bg-gray-900 text-white py-4 shadow-lg">
-                    <div className="container mx-auto px-4">
-                        <h1 className="text-xl font-bold flex items-center">
-                            <TonCrystalIcon />
-                            Harvester9000
-                        </h1>
-                    </div>
+                <header className="bg-gray-900 text-white py-4 px-4 fixed top-0 left-0 right-0 z-10">
+                    <h1 className="text-2xl font-bold">Harvester9000</h1>
                 </header>
             );
         };
 
-        // Main App component (unchanged)
+        // BottomNavigation component (unchanged)
+        const BottomNavigation = () => {
+            return (
+                <nav className="bottom-nav fixed bottom-0 left-0 right-0 flex justify-around items-center py-2">
+                    <button className="flex flex-col items-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M9 22V12h6v10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="text-xs mt-1">Home</span>
+                    </button>
+                    <button className="flex flex-col items-center text-blue-500">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="text-xs mt-1">Launcher</span>
+                    </button>
+                    <button className="flex flex-col items-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="text-xs mt-1">Quests</span>
+                    </button>
+                    <button className="flex flex-col items-center">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="text-xs mt-1">Settings</span>
+                    </button>
+                </nav>
+            );
+        };
+
+        // Main App component (updated)
         const App = () => {
             React.useEffect(() => {
                 window.Telegram.WebApp.ready();
@@ -141,11 +179,13 @@
             }, []);
 
             return (
-                <div className="min-h-screen bg-gray-900">
+                <div className="min-h-screen bg-gray-900 pb-16">
                     <Header />
-                    <main className="container mx-auto px-4 py-6">
+                    <main className="container mx-auto px-4 pt-20 pb-24">
+                        <h2 className="text-2xl font-bold mb-6 text-center">Available Games</h2>
                         <GameGrid games={GAMES} />
                     </main>
+                    <BottomNavigation />
                 </div>
             );
         };
