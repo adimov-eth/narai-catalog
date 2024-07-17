@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Clicker Meta-App</title>
+    <title>Harvester9000</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
@@ -74,7 +74,7 @@
             return timeRemaining;
         };
 
-        // TON Crystal Icon component (updated for dark theme)
+        // TON Crystal Icon component (unchanged)
         const TonCrystalIcon = () => (
             <svg className="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#36BBFF" />
@@ -82,7 +82,7 @@
             </svg>
         );
 
-        // GameCard component (updated for dark theme)
+        // GameCard component (unchanged)
         const GameCard = ({ game }) => {
             const timeRemaining = useTimer(game.interval * 60);
 
@@ -119,21 +119,21 @@
             );
         };
 
-        // Header component (updated for dark theme)
+        // Header component (updated with new app name)
         const Header = () => {
             return (
                 <header className="bg-gray-900 text-white py-4 shadow-lg">
                     <div className="container mx-auto px-4">
                         <h1 className="text-xl font-bold flex items-center">
                             <TonCrystalIcon />
-                            Clicker Games Meta-App
+                            Harvester9000
                         </h1>
                     </div>
                 </header>
             );
         };
 
-        // Main App component (updated for dark theme)
+        // Main App component (unchanged)
         const App = () => {
             React.useEffect(() => {
                 window.Telegram.WebApp.ready();
