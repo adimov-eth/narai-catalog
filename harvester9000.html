@@ -78,6 +78,26 @@
             }
         };
 
+        // Custom hook for timer (unchanged)
+        const useTimer = (initialTime) => {
+            const [timeRemaining, setTimeRemaining] = React.useState(initialTime);
+
+            React.useEffect(() => {
+                const timer = setInterval(() => {
+                    setTimeRemaining((prevTime) => {
+                        if (prevTime <= 0) {
+                            return initialTime;
+                        }
+                        return prevTime - 1;
+                    });
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, [initialTime]);
+
+            return timeRemaining;
+        };
+
         // Telegram Icon component (unchanged)
         const TelegramIcon = () => (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,8 +105,50 @@
             </svg>
         );
 
-        // GameCard component (unchanged)
+        // CircularTimer component (new)
+        const CircularTimer = ({ timeRemaining, totalTime }) => {
+            const strokeWidth = 4;
+            const radius = 18;
+            const circumference = 2 * Math.PI * radius;
+            const progress = (timeRemaining / totalTime) * circumference;
+
+            return (
+                <div className="relative w-12 h-12">
+                    <svg className="w-full h-full" viewBox="0 0 44 44">
+                        <circle
+                            className="text-gray-700"
+                            strokeWidth={strokeWidth}
+                            stroke="currentColor"
+                            fill="transparent"
+                            r={radius}
+                            cx="22"
+                            cy="22"
+                        />
+                        <circle
+                            className="text-blue-500 transition-all duration-1000 ease-linear"
+                            strokeWidth={strokeWidth}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={circumference - progress}
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r={radius}
+                            cx="22"
+                            cy="22"
+                            transform="rotate(-90 22 22)"
+                        />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-sm font-medium">
+                        {Math.ceil(timeRemaining / 60)}m
+                    </span>
+                </div>
+            );
+        };
+
+        // GameCard component (updated with CircularTimer)
         const GameCard = ({ game }) => {
+            const timeRemaining = useTimer(game.interval * 60);
+
             const handleOpenGame = () => {
                 window.Telegram.WebApp.openTelegramLink(game.deepLink);
             };
@@ -102,6 +164,7 @@
                                 <div className="bg-gray-700 p-2 rounded-full mr-2">
                                     <TelegramIcon />
                                 </div>
+                                <CircularTimer timeRemaining={timeRemaining} totalTime={game.interval * 60} />
                             </div>
                             <button
                                 onClick={handleOpenGame}
@@ -126,7 +189,7 @@
             );
         };
 
-        // Header component (unchanged)
+        // Header component (updated with new app name)
         const Header = () => {
             return (
                 <header className="bg-gray-900 text-white py-4 px-4 fixed top-0 left-0 right-0 z-10">
@@ -135,7 +198,7 @@
             );
         };
 
-        // BottomNavigation component (unchanged)
+         // BottomNavigation component (continued)
         const BottomNavigation = () => {
             return (
                 <nav className="bottom-nav fixed bottom-0 left-0 right-0 flex justify-around items-center py-2">
