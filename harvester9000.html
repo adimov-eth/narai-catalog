@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Clicker Meta-App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Mock data
+        const GAMES = {
+            game1: {
+                name: "Clicker Adventure",
+                description: "Click your way to riches!",
+                deepLink: "https://t.me/ClickerAdventureBot/play",
+                interval: 60 // minutes
+            },
+            game2: {
+                name: "Token Farmer",
+                description: "Grow and harvest tokens",
+                deepLink: "https://t.me/TokenFarmerBot/play",
+                interval: 120 // minutes
+            },
+            game3: {
+                name: "Crypto Miner",
+                description: "Mine virtual cryptocurrencies",
+                deepLink: "https://t.me/CryptoMinerBot/play",
+                interval: 180 // minutes
+            },
+            game4: {
+                name: "Idle Empire",
+                description: "Build your idle empire",
+                deepLink: "https://t.me/IdleEmpireBot/play",
+                interval: 240 // minutes
+            },
+            game5: {
+                name: "Tap Tycoon",
+                description: "Become a tapping tycoon",
+                deepLink: "https://t.me/TapTycoonBot/play",
+                interval: 90 // minutes
+            }
+        };
+
+        // Custom hook for timer
+        const useTimer = (initialTime) => {
+            const [timeRemaining, setTimeRemaining] = React.useState(initialTime);
+
+            React.useEffect(() => {
+                const timer = setInterval(() => {
+                    setTimeRemaining((prevTime) => {
+                        if (prevTime <= 0) {
+                            return initialTime;
+                        }
+                        return prevTime - 1;
+                    });
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, [initialTime]);
+
+            return timeRemaining;
+        };
+
+        // GameCard component
+        const GameCard = ({ game }) => {
+            const timeRemaining = useTimer(game.interval * 60);
+
+            const handleOpenGame = () => {
+                window.Telegram.WebApp.openTelegramLink(game.deepLink);
+            };
+
+            return (
+                <div className="bg-white rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-bold mb-2">{game.name}</h2>
+                    <p className="text-gray-600 mb-4">{game.description}</p>
+                    <p className="text-lg font-semibold mb-4">
+                        Time remaining: {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+                    </p>
+                    <button
+                        onClick={handleOpenGame}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        Open Game
+                    </button>
+                </div>
+            );
+        };
+
+        // GameGrid component
+        const GameGrid = ({ games }) => {
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Object.entries(games).map(([key, game]) => (
+                        <GameCard key={key} game={game} />
+                    ))}
+                </div>
+            );
+        };
+
+        // Header component
+        const Header = () => {
+            return (
+                <header className="bg-blue-600 text-white py-4">
+                    <div className="container mx-auto px-4">
+                        <h1 className="text-2xl font-bold">Clicker Games Meta-App</h1>
+                    </div>
+                </header>
+            );
+        };
+
+        // Main App component
+        const App = () => {
+            React.useEffect(() => {
+                window.Telegram.WebApp.ready();
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    <Header />
+                    <main className="container mx-auto px-4 py-8">
+                        <GameGrid games={GAMES} />
+                    </main>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
