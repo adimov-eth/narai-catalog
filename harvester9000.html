@@ -11,12 +11,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #F0F2F5;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-color: #1E1E1E;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23383838' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
     </style>
 </head>
-<body>
+<body class="text-gray-200">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -74,15 +74,15 @@
             return timeRemaining;
         };
 
-        // TON Crystal Icon component
+        // TON Crystal Icon component (updated for dark theme)
         const TonCrystalIcon = () => (
             <svg className="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#0088CC" />
-                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#0088CC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#36BBFF" />
+                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#36BBFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
         );
 
-        // GameCard component (updated)
+        // GameCard component (updated for dark theme)
         const GameCard = ({ game }) => {
             const timeRemaining = useTimer(game.interval * 60);
 
@@ -91,16 +91,16 @@
             };
 
             return (
-                <div className="bg-white rounded-lg shadow-md p-4 transition-transform duration-300 ease-in-out transform hover:scale-105">
-                    <h2 className="text-lg font-bold mb-2 text-gray-800">{game.name}</h2>
-                    <p className="text-sm text-gray-600 mb-3">{game.description}</p>
-                    <p className="text-sm font-semibold mb-3 text-blue-600">
+                <div className="bg-gray-800 rounded-lg shadow-lg p-4 transition-transform duration-300 ease-in-out transform hover:scale-105 hover:bg-gray-750">
+                    <h2 className="text-lg font-bold mb-2 text-blue-300">{game.name}</h2>
+                    <p className="text-sm text-gray-400 mb-3">{game.description}</p>
+                    <p className="text-sm font-semibold mb-3 text-blue-400">
                         <TonCrystalIcon />
                         Time remaining: {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
                     </p>
                     <button
                         onClick={handleOpenGame}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
                     >
                         Open Game
                     </button>
@@ -108,7 +108,7 @@
             );
         };
 
-        // GameGrid component (updated)
+        // GameGrid component (unchanged)
         const GameGrid = ({ games }) => {
             return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -119,10 +119,10 @@
             );
         };
 
-        // Header component (updated)
+        // Header component (updated for dark theme)
         const Header = () => {
             return (
-                <header className="bg-blue-500 text-white py-4 shadow-md">
+                <header className="bg-gray-900 text-white py-4 shadow-lg">
                     <div className="container mx-auto px-4">
                         <h1 className="text-xl font-bold flex items-center">
                             <TonCrystalIcon />
@@ -133,7 +133,7 @@
             );
         };
 
-        // Main App component (updated)
+        // Main App component (updated for dark theme)
         const App = () => {
             React.useEffect(() => {
                 window.Telegram.WebApp.ready();
@@ -141,7 +141,7 @@
             }, []);
 
             return (
-                <div className="min-h-screen bg-gray-100">
+                <div className="min-h-screen bg-gray-900">
                     <Header />
                     <main className="container mx-auto px-4 py-6">
                         <GameGrid games={GAMES} />
