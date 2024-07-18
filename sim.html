@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TON Stars Economy Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        #controls input { width: 50px; }
+        #results { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>TON Stars Economy Simulation</h1>
+    <div id="controls">
+        <label>Days: <input type="number" id="days" value="30" min="1" max="365"></label>
+        <label>Click efficiency (%): <input type="number" id="clickEfficiency" value="100" min="0" max="100"></label>
+        <label>Energy boosters per day: <input type="number" id="boostersPerDay" value="0" min="0" max="6"></label>
+        <label>Missions completed: <input type="number" id="missionsPerDay" value="5" min="0" max="10"></label>
+        <button id="simulate">Simulate</button>
+    </div>
+    <div id="results"></div>
+    <canvas id="chart"></canvas>
+
+    <script>
+    // Game constants
+    const LEVELS = [
+        { name: "Protostar", energy: 500, quarksToUpgrade: 1000, quarksPerClick: 1 },
+        { name: "Brown Dwarf", energy: 750, quarksToUpgrade: 5000, quarksPerClick: 2 },
+        { name: "Red Dwarf", energy: 1000, quarksToUpgrade: 10000, quarksPerClick: 2 },
+        { name: "White Dwarf", energy: 1500, quarksToUpgrade: 50000, quarksPerClick: 3 },
+        { name: "Red Giant", energy: 2000, quarksToUpgrade: 100000, quarksPerClick: 4 },
+        { name: "Blue Giant", energy: 2500, quarksToUpgrade: 500000, quarksPerClick: 5 },
+        { name: "Blue Supergiant", energy: 3000, quarksToUpgrade: 1000000, quarksPerClick: 6 },
+        { name: "Neutron Star", energy: 3500, quarksToUpgrade: 5000000, quarksPerClick: 7 },
+        { name: "Supernova", energy: 4000, quarksToUpgrade: 10000000, quarksPerClick: 8 },
+        { name: "Black Hole", energy: 5000, quarksToUpgrade: 100000000, quarksPerClick: 10 }
+    ];
+
+    const DAILY_REWARDS = [50, 100, 200, 300, 500, 750, 1000, 1500, 2000, 1000];
+    const QUARK_TO_STAR_RATE = 1000;
+    const MAX_DAILY_SWAP = 10;
+    const ENERGY_RECHARGE_TIME = 180; // minutes
+
+    // Game state
+    let state = {
+        day: 0,
+        quarks: 0,
+        stars: 0,
+        level: 0,
+    };
+
+    // Helper functions
+    const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+    const getCurrentLevel = () => LEVELS[state.level];
+
+    // Game logic functions
+    const calculateMaxClicks = (boosters) => {
+        const level = getCurrentLevel();
+        const naturalRecharges = Math.floor(1440 / ENERGY_RECHARGE_TIME);
+        const totalEnergy = level.energy * (naturalRecharges + 1 + boosters);
+        return Math.floor(totalEnergy / level.quarksPerClick);
+    };
+
+    const simulateClick = (clicks, efficiency) => {
+        const level = getCurrentLevel();
+        const actualClicks = Math.floor(clicks * (efficiency / 100));
+        return actualClicks * level.quarksPerClick;
+    };
+
+    const simulateMissions = (missions) => missions * 100; // Assuming 100 quarks per mission
+
+    const simulateDailyReward = () => {
+        const rewardIndex = Math.min(state.day, DAILY_REWARDS.length - 1);
+        return DAILY_REWARDS[rewardIndex];
+    };
+
+    const simulateDay = (clickEfficiency, boosters, missions) => {
+        const maxClicks = calculateMaxClicks(boosters);
+        state.quarks += simulateClick(maxClicks, clickEfficiency);
+        state.quarks += simulateMissions(missions);
+        state.quarks += simulateDailyReward();
+        
+        // Check for level up
+        while (state.level < LEVELS.length - 1 && state.quarks >= LEVELS[state.level].quarksToUpgrade) {
+            state.quarks -= LEVELS[state.level].quarksToUpgrade;
+            state.level++;
+        }
+
+        // Simulate star swap (assuming player always swaps max possible)
+        const maxSwap = Math.min(Math.floor(state.quarks / QUARK_TO_STAR_RATE), MAX_DAILY_SWAP);
+        state.stars += maxSwap;
+        state.quarks -= maxSwap * QUARK_TO_STAR_RATE;
+
+        state.day++;
+    };
+
+    // Simulation function
+    const runSimulation = (days, clickEfficiency, boostersPerDay, missionsPerDay) => {
+        state = { day: 0, quarks: 0, stars: 0, level: 0 };
+        const results = [];
+
+        for (let day = 0; day < days; day++) {
+            simulateDay(clickEfficiency, boostersPerDay, missionsPerDay);
+            results.push({ ...state });
+        }
+
+        return results;
+    };
+
+    // UI update functions
+    const updateResults = (results) => {
+        const lastDay = results[results.length - 1];
+        const maxClicks = calculateMaxClicks(parseInt(document.getElementById('boostersPerDay').value));
+        document.getElementById('results').innerHTML = `
+            <p>Final day: ${lastDay.day}</p>
+            <p>Quarks: ${lastDay.quarks.toFixed(2)}</p>
+            <p>Stars: ${lastDay.stars.toFixed(2)}</p>
+            <p>Level: ${lastDay.level} (${LEVELS[lastDay.level].name})</p>
+            <p>Max clicks per day: ${maxClicks}</p>
+        `;
+    };
+
+    const updateChart = (results) => {
+        const ctx = document.getElementById('chart').getContext('2d');
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded. Displaying data in table format.');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr><th>Day</th><th>Quarks</th><th>Stars</th></tr>
+                ${results.map(r => `<tr><td>${r.day}</td><td>${r.quarks.toFixed(2)}</td><td>${r.stars.toFixed(2)}</td></tr>`).join('')}
+            `;
+            ctx.canvas.parentNode.replaceChild(table, ctx.canvas);
+            return;
+        }
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: results.map(r => r.day),
+                datasets: [{
+                    label: 'Quarks',
+                    data: results.map(r => r.quarks),
+                    borderColor: 'blue',
+                    tension: 0.1
+                }, {
+                    label: 'Stars',
+                    data: results.map(r => r.stars),
+                    borderColor: 'gold',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Amount'
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    // Event listener
+    document.getElementById('simulate').addEventListener('click', () => {
+        const days = parseInt(document.getElementById('days').value);
+        const clickEfficiency = parseInt(document.getElementById('clickEfficiency').value);
+        const boostersPerDay = parseInt(document.getElementById('boostersPerDay').value);
+        const missionsPerDay = parseInt(document.getElementById('missionsPerDay').value);
+
+        const results = runSimulation(days, clickEfficiency, boostersPerDay, missionsPerDay);
+        updateResults(results);
+        updateChart(results);
+    });
+    </script>
+</body>
+</html>
