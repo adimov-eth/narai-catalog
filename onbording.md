@@ -6,7 +6,7 @@ Got it. Here’s how we can refine the onboarding text to include elements of yo
 🚀 **Join the Future of Clicker Games!**
 - Tap to earn Quarks effortlessly.
 - Convert Quarks to rare, valuable Stars.
-- Be an early adopter and get Stars at lower prices!
+- Be an early adopter and get Stars at better prices!
 - Shape the game's economy with every action.
 
 👉 **Start Tapping and Build Your Cosmic Empire!**
