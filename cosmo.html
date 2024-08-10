@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmo in Space</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        #space {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #cosmo {
+            position: relative;
+            margin-top: 40px;
+            z-index: 10;
+        }
+        #info {
+            position: absolute;
+            bottom: 20px;
+            color: white;
+            text-align: center;
+            width: 100%;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="space"></canvas>
+    <img id="cosmo" src="./cosmo1.webp" alt="Cosmo the Astronaut">
+    <div id="info">Click or tap to add more stars!</div>
+
+    <script>
+        const canvas = document.getElementById('space');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createStar(x, y) {
+            return {
+                x: x || Math.random() * canvas.width,
+                y: y || Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                speed: Math.random() * 0.5
+            };
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+                star.y = (star.y + star.speed) % canvas.height;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        function initStars() {
+            for (let i = 0; i < 100; i++) {
+                stars.push(createStar());
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('click', (e) => {
+            for (let i = 0; i < 5; i++) {
+                stars.push(createStar(e.clientX, e.clientY));
+            }
+        });
+
+        resizeCanvas();
+        initStars();
+        drawStars();
+    </script>
+</body>
+</html>
