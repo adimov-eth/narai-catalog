@@ -1,61 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avve Bar</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<style>
-  body { background-color: #1a202c; color: #e53e3e; }
-  a { transition: color 0.3s ease; }
-  a:hover { color: #9b2c2c; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Crash Game Prototype</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #multiplier {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #bet-input, #auto-cashout-input {
+            font-size: 18px;
+            padding: 5px;
+            width: 100px;
+        }
+        #game-log {
+            margin-top: 20px;
+            text-align: left;
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff4500;
+        }
+        #visualization {
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+            background-color: #e0e0e0;
+            overflow: hidden;
+        }
+        #rocket {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid #ff4500;
+            transition: bottom 0.1s linear;
+        }
+        #fairness-panel {
+            margin-top: 20px;
+            text-align: left;
+        }
+        #client-seed {
+            width: 200px;
+        }
+    </style>
 </head>
-
 <body>
-<div class="flex flex-col items-center p-4">
-  <img src="/images/logo.png" class="rounded-full mt-8 mb-4" style="width: 150px;" alt="logo">
-  <h1 class="text-2xl font-bold my-4">Avve Bar</h1>
-  <a href="https://instagram.com/avvebaravve" class="bg-red-700 text-white py-2 px-4 rounded-full my-2 w-full text-center">Instagram</a>
-  <a href="/menu" class="bg-red-700 text-white py-2 px-4 rounded-full my-2 w-full text-center">Menu</a>
-  <!-- Address fields with copy buttons and feedback messages -->
-  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
-    <span class="mr-2">TRC20:</span>
-    <input type="text" value="TS3nSfEKq9PxRAvbpcJF1Tq1Ah6zH5F4AG" class="bg-transparent text-center flex-1 text-white" readonly>
-    <button class="copy-btn" data-address="TS3nSfEKq9PxRAvbpcJF1Tq1Ah6zH5F4AG">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
-    </button>
-    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
-  </div>
-  <div class="relative flex items-center bg-gray-800 p-2 rounded-lg my-2 w-full">
-    <span class="mr-2">Tinkoff:</span>
-    <input type="text" value="89263686438" class="bg-transparent text-center flex-1 text-white" readonly>
-    <button class="copy-btn" data-address="89263686438">
-      <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons/icons/clipboard.svg" alt="copy" class="w-6 h-6">
-    </button>
-    <span class="copy-feedback absolute -bottom-8 left-1/2 transform -translate-x-1/2 scale-0 transition-all opacity-0 text-green-500 text-sm">Copied!</span>
-  </div>
-</div>
-<script>
-  document.querySelectorAll('.copy-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const address = this.getAttribute('data-address');
-      const feedback = this.nextElementSibling;
-      const el = document.createElement('textarea');
-      el.value = address;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      // Show feedback message
-      feedback.classList.replace('scale-0', 'scale-100');
-      feedback.classList.replace('opacity-0', 'opacity-100');
-      setTimeout(() => {
-        feedback.classList.replace('scale-100', 'scale-0');
-        feedback.classList.replace('opacity-100', 'opacity-0');
-      }, 2000); // Hide feedback after 2 seconds
-    });
-  });
-</script>
+    <div class="game-container">
+        <h1>Multiplayer Crash Game</h1>
+        <div id="countdown">Next round in: 5</div>
+        <div id="visualization">
+            <div id="rocket"></div>
+        </div>
+        <div id="multiplier">1.00x</div>
+        <input type="number" id="bet-input" placeholder="Bet amount" min="1" value="100">
+        <input type="number" id="auto-cashout-input" placeholder="Auto cashout" min="1.01" step="0.01">
+        <button id="place-bet">Place Bet</button>
+        <button id="cash-out" disabled>Cash Out</button>
+        <div>Balance: $<span id="balance">1000</span></div>
+        <div id="game-log"></div>
+        <div id="fairness-panel">
+            <h3>Provably Fair</h3>
+            <p>Server Seed Hash: <span id="server-seed-hash"></span></p>
+            <input type="text" id="client-seed" placeholder="Enter client seed">
+            <button id="verify-button">Verify Fairness</button>
+        </div>
+    </div>
+
+    <script>
+        const multiplierElement = document.getElementById('multiplier');
+        const placeBetButton = document.getElementById('place-bet');
+        const cashOutButton = document.getElementById('cash-out');
+        const betInput = document.getElementById('bet-input');
+        const autoCashoutInput = document.getElementById('auto-cashout-input');
+        const balanceElement = document.getElementById('balance');
+        const gameLog = document.getElementById('game-log');
+        const countdownElement = document.getElementById('countdown');
+        const rocketElement = document.getElementById('rocket');
+        const clientSeedInput = document.getElementById('client-seed');
+        const verifyButton = document.getElementById('verify-button');
+
+        let animationFrameId;
+        let lastTimestamp;
+        let currentMultiplier = 1.00;
+        let playerBet = 0;
+        let balance = 1000;
+        let crashPoint = 0;
+        let cashouts = [];
+        let countdownTimer;
+        let gameActive = false;
+        let playerCashedOut = false;
+        let autoCashoutValue = 0;
+        let serverSeed = '';
+        let clientSeed = 'default';
+
+        function generateHash(seed) {
+            return CryptoJS.SHA256(seed).toString();
+        }
+
+        function divisible(hash, mod) {
+            let val = 0;
+            let o = hash.length % 4;
+            for (let i = o > 0 ? o - 4 : 0; i < hash.length; i += 4) {
+                val = ((val << 16) + parseInt(hash.substring(i, i + 4), 16)) % mod;
+            }
+            return val === 0;
+        }
+
+        function crashPointFromHash(seed) {
+            const hash = CryptoJS.HmacSHA256(seed, clientSeed).toString();
+            const hs = parseInt(100 / 4);
+            if (divisible(hash, hs)) {
+                return 1;
+            }
+            const h = parseInt(hash.slice(0, 52 / 4), 16);
+            const e = Math.pow(2, 52);
+            return Math.floor((100 * e - h) / (e - h)) / 100.0;
+        }
+
+        function calculateCashoutImpact(cashouts, currentMultiplier) {
+            return cashouts.reduce((impact, cashout) => {
+                return impact + (cashout / currentMultiplier) * 0.01;
+            }, 0);
+        }
+
+        function adjustedCrashPoint(initialPoint, cashoutImpact) {
+            const adjustedPoint = initialPoint * (1 + cashoutImpact);
+            return Math.min(adjustedPoint, 1000000) * 0.99;
+        }
+
+        function generateServerSeed() {
+            const array = new Uint32Array(4);
+            crypto.getRandomValues(array);
+            return Array.from(array, dec => dec.toString(16).padStart(8, '0')).join('');
+        }
+
+        function startCountdown() {
+            gameActive = false;
+            placeBetButton.disabled = false;
+            cashOutButton.disabled = true;
+            rocketElement.style.bottom = '0px';
+            let count = 5;
+            countdownElement.textContent = `Next round in: ${count}`;
+            countdownTimer = setInterval(() => {
+                count--;
+                countdownElement.textContent = `Next round in: ${count}`;
+                if (count === 0) {
+                    clearInterval(countdownTimer);
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            gameActive = true;
+            currentMultiplier = 1.00;
+            serverSeed = generateServerSeed();
+            const serverSeedHash = generateHash(serverSeed);
+            document.getElementById('server-seed-hash').textContent = serverSeedHash;
+            crashPoint = crashPointFromHash(serverSeed);
+            cashouts = [];
+            playerCashedOut = false;
+            updateRocket();
+            multiplierElement.style.color = 'black';
+            log("New game started!");
+            requestAnimationFrame(updateGame);
+        }
+
+        function updateGame(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+
+            if (!gameActive) return;
+
+            currentMultiplier += 0.01;
+            multiplierElement.textContent = currentMultiplier.toFixed(2) + 'x';
+            updateRocket();
+
+            if (Math.random() < 0.1) {
+                cashouts.push(currentMultiplier);
+                log(`Player cashed out at ${currentMultiplier.toFixed(2)}x`);
+            }
+
+            const cashoutImpact = calculateCashoutImpact(cashouts, currentMultiplier);
+            crashPoint = adjustedCrashPoint(crashPoint, cashoutImpact);
+
+            if (currentMultiplier >= crashPoint) {
+                endGame();
+            } else if (!playerCashedOut && autoCashoutValue > 0 && currentMultiplier >= autoCashoutValue) {
+                cashOut();
+            } else {
+                animationFrameId = requestAnimationFrame(updateGame);
+            }
+        }
+
+        function updateRocket() {
+            const progress = Math.min((currentMultiplier - 1) / 4, 1);
+            const bottomPosition = progress * 160;
+            rocketElement.style.bottom = `${bottomPosition}px`;
+        }
+
+        function endGame() {
+            cancelAnimationFrame(animationFrameId);
+            gameActive = false;
+            multiplierElement.style.color = 'red';
+            log(`Game crashed at ${currentMultiplier.toFixed(2)}x`);
+            
+            if (playerBet > 0) {
+                log(`You lost $${playerBet}`);
+                playerBet = 0;
+            }
+            
+            placeBetButton.disabled = false;
+            cashOutButton.disabled = true;
+            startCountdown();
+        }
+
+        function placeBet() {
+            if (!gameActive) return;
+            playerBet = parseInt(betInput.value);
+            autoCashoutValue = parseFloat(autoCashoutInput.value) || 0;
+            if (playerBet > balance) {
+                alert("Not enough balance!");
+                return;
+            }
+            balance -= playerBet;
+            updateBalance();
+            placeBetButton.disabled = true;
+            cashOutButton.disabled = false;
+            log(`You placed a bet of $${playerBet}`);
+        }
+
+        function cashOut() {
+            if (!gameActive || playerBet === 0 || playerCashedOut) return;
+            const winnings = Math.floor(playerBet * currentMultiplier);
+            balance += winnings;
+            updateBalance();
+            cashOutButton.disabled = true;
+            placeBetButton.disabled = true;
+            log(`You cashed out at ${currentMultiplier.toFixed(2)}x and won $${winnings - playerBet}`);
+            playerBet = 0;
+            autoCashoutValue = 0;
+            playerCashedOut = true;
+        }
+
+        function updateBalance() {
+            balanceElement.textContent = balance;
+        }
+
+        function log(message) {
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            gameLog.prepend(logEntry);
+        }
+
+        function verifyFairness() {
+            const inputServerSeed = prompt("Enter the server seed:");
+            const inputClientSeed = clientSeedInput.value || "default";
+            const calculatedCrashPoint = crashPointFromHash(inputServerSeed);
+            alert(`Calculated crash point: ${calculatedCrashPoint.toFixed(2)}x`);
+        }
+
+        placeBetButton.addEventListener('click', placeBet);
+        cashOutButton.addEventListener('click', cashOut);
+        verifyButton.addEventListener('click', verifyFairness);
+        clientSeedInput.addEventListener('change', (e) => {
+            clientSeed = e.target.value || "default";
+        });
+
+        startCountdown();
+    </script>
 </body>
 </html>
