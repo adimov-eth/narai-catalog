@@ -1,106 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blurred Backdrop Comparison</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .method {
-            margin-bottom: 40px;
-        }
-        h2 {
-            margin-bottom: 10px;
-        }
-        .image-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            overflow: hidden;
-        }
-        .method-2 .backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            filter: blur(10px);
-            transform: scale(1.1);
-        }
-        .method-2 .main-image {
-            position: relative;
-            z-index: 1;
-        }
-        .method-3 svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        .method-3 .main-image {
-            position: relative;
-            z-index: 1;
-        }
-        .method-4 .gradient-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 30%, #f0f0f0 0%, #e0e0e0 20%, #d0d0d0 40%, #c0c0c0 60%, #b0b0b0 80%, #a0a0a0 100%);
-            filter: blur(20px);
-        }
-        .method-4 .main-image {
-            position: relative;
-            z-index: 1;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #000;
+        color: #fff;
+      }
+      .method {
+        margin-bottom: 40px;
+      }
+      h2 {
+        margin-bottom: 10px;
+      }
+      .image-container {
+        position: relative;
+        width: 80px;
+        height: 72px;
+        padding: 30px;
+        overflow: hidden;
+      }
+      .method-2 .backdrop {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        filter: blur(12px);
+        width: 80px;
+        height: 72px;
+        z-index: 0;
+      }
+      .method-2 .main-image {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 72px;
+        z-index: 1;
+      }
+      .method-3 svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 128px;
+        height: 120px;
+        z-index: 0;
+      }
+
+      .method-3 .main-image {
+        position: relative;
+        width: 80px;
+        height: 72px;
+        z-index: 1;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Blurred Backdrop Comparison</h1>
 
     <div class="method method-1">
-        <h2>Method 1: Backdrop Inside PNG</h2>
-        <p>This method uses a pre-blurred image with the backdrop included.</p>
-        <img src="https://bkk.lol/case2.png" alt="Pre-blurred image" width="300">
+      <h2>Method 1: Backdrop Inside PNG</h2>
+      <p>This method uses a pre-blurred image with the backdrop included.</p>
+      <img
+        src="https://bkk.lol/case2.png"
+        alt="Pre-blurred image"
+        width="128"
+      />
     </div>
 
     <div class="method method-2">
-        <h2>Method 2: CSS Filter Blur</h2>
-        <p>This method uses CSS to create a blurred copy of the original image as a backdrop.</p>
-        <div class="image-container">
-            <img class="backdrop" src="https://bkk.lol/case1.png" alt="Blurred backdrop">
-            <img class="main-image" src="https://bkk.lol/case1.png" alt="Main image" width="300">
-        </div>
+      <h2>Method 2: CSS Filter Blur</h2>
+      <p>
+        This method uses CSS to create a blurred copy of the original image as a
+        backdrop.
+      </p>
+      <div class="image-container">
+        <img
+          class="backdrop"
+          src="https://bkk.lol/case1.png"
+          alt="Blurred backdrop"
+        />
+        <img
+          class="main-image"
+          src="https://bkk.lol/case1.png"
+          alt="Main image"
+        />
+      </div>
     </div>
 
     <div class="method method-3">
-        <h2>Method 3: SVG Blur with Base64 Image</h2>
-        <p>This method uses an inline SVG with a base64 encoded smaller version of the image and applies an SVG blur filter.</p>
-        <div class="image-container">
-            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <filter id="blur">
-                    <feGaussianBlur stdDeviation="10" />
-                </filter>
-                <image xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAMAAAAs2N9uAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAsSwAALEsBpT2WqQAAAuVQTFRFAAAAhlbF4MTp1brYxKTLoIar++T7/un+79LxwqTMl2urspDV0ZLXl2vNb16mXEF0h3C+c1iitpbks5Tkp4fdlXfQkXLPpILSgU67jmq9bGe5dIDUeYTjf4nqiILklH3glHrdl3rdl3rcmHjbglfFgGnSY2vDi57mrcD+j6f4gInqmobklXbal3XZvZPb/u32xYbRo3zOf3jZf4/heJXvh6H1obf9f5LlfWvKl3TTp3zW3rvnyZTO1ZLJuGSl3ZXBnpbsgWa+XWCyZXrYbo/uU3riS3LdTm3MS1SwcE2oeFe0omawzovJ4anV46bPuHK61YS7/Ob7aFzDUF/AJVK+Hky1EjudM1K1PWPJNFG8REuycWjJiHLPkGS1oWe+oVqur2Gp0JDOzYC4rXWuZDueQ1G4Jj2SJ0CbQU+xIEKhZHbNcX/YY2/PnaPrtr/4cWzOiW3Mq2i+wHO5j06FmlCNkmKibTSZZGfRY2m9Z2q2gn3ZbWnIXmq+d33SjpHkpq3reXDROSlfVjp+cTSHqF2VPytXWDhvFw0rZEKWUUmpWWK6XGKuh4vriYzrWF2tYWKrgYLgLiBFVCZpFxE6WkCXVzBzWyJiJg4+ckKO0J7aUTuIXC6HMzOHHStqOkydVmS/T1apXl+qfYDgHhg8WStyQzJ6MB1SOCBSPxJENxI/Rh9Zl1yyX0ugckGlMBlRRx5jRSdsDxJGFRdEISNfNDiFLydiPyttKBZJORZPNRZMQBpZLRM/RCFamV7DWkicdkauTTqLcjKDWR1OHggmDAYXFQglLxFFMxRLQRdWTxxlViNvMRVDRBxcOxtRWTR2nGLIExRIfUOrWkaeTDeNDgsqEQorEgYZKA00NxNNTR1iejGWkE+zbECKWyVyiF2rpIrPxavygEOuPDWKSzaMEgooGwkrHQspOBhMXix+cTSPaj+MVDBwVipvjUCrRjOFTzuRHhU9Si5ya0OcbkeiilzFhUCmiEmuzKsTiQAAAPd0Uk5TAAEuVWFVMj1qjnwPE4Dz/////v///LoPHcT/////////11oHO+j////////9jQ4EF6L4////////yjcHeFmCLwqW///////////ZuKORsvSlClP1///////////////////4gjDk///////////////////6bijg//////////////////+BCZL5///////////////////HObv/////////////////////hq//////////////////////e3z7///////////////////lTwRy/////////////eSqf0AJAsL/////+MPApXReChCSzMaHNgsSEa/nSQEAAABZSURBVHicY2QAA0YE+MoIFuFBEnoJFpJAErnLABJSQRK5CDSEwYARFRxkdGDEAEGYQimYQmWYQh2YQrMwhdZgCu3DFLqALqDAyPAQmS8MChUGhncwPhckoACWAgyRePG1UgAAAABJRU5ErkJggg==" width="300" height="300" filter="url(#blur)" />
-            </svg>
-            <img class="main-image" src="https://bkk.lol/case1.png" alt="Main image" width="300">
-        </div>
+      <h2>Method 3: SVG Blur with Base64 Image</h2>
+      <p>
+        This method uses an inline SVG with a base64 encoded smaller version of
+        the image and applies an SVG blur filter.
+      </p>
+      <div class="image-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          width="128"
+          height="120"
+          fill="none"
+        >
+          <g filter="url(#a)">
+            <path fill="url(#b)" d="M24 24h80v71.111H24z" />
+          </g>
+          <defs>
+            <pattern
+              id="b"
+              width="1"
+              height="1"
+              patternContentUnits="objectBoundingBox"
+            >
+              <use xlink:href="#c" transform="scale(.05556 .0625)" />
+            </pattern>
+            <filter
+              id="a"
+              width="128"
+              height="119.111"
+              x="0"
+              y="0"
+              color-interpolation-filters="sRGB"
+              filterUnits="userSpaceOnUse"
+            >
+              <feFlood flood-opacity="0" result="BackgroundImageFix" />
+              <feBlend
+                in="SourceGraphic"
+                in2="BackgroundImageFix"
+                result="shape"
+              />
+              <feGaussianBlur
+                result="effect1_foregroundBlur_1_2"
+                stdDeviation="12"
+              />
+            </filter>
+            <image
+              xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAMAAAAs2N9uAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAsSwAALEsBpT2WqQAAAuVQTFRFAAAAhlbF4MTp1brYxKTLoIar++T7/un+79LxwqTMl2urspDV0ZLXl2vNb16mXEF0h3C+c1iitpbks5Tkp4fdlXfQkXLPpILSgU67jmq9bGe5dIDUeYTjf4nqiILklH3glHrdl3rdl3rcmHjbglfFgGnSY2vDi57mrcD+j6f4gInqmobklXbal3XZvZPb/u32xYbRo3zOf3jZf4/heJXvh6H1obf9f5LlfWvKl3TTp3zW3rvnyZTO1ZLJuGSl3ZXBnpbsgWa+XWCyZXrYbo/uU3riS3LdTm3MS1SwcE2oeFe0omawzovJ4anV46bPuHK61YS7/Ob7aFzDUF/AJVK+Hky1EjudM1K1PWPJNFG8REuycWjJiHLPkGS1oWe+oVqur2Gp0JDOzYC4rXWuZDueQ1G4Jj2SJ0CbQU+xIEKhZHbNcX/YY2/PnaPrtr/4cWzOiW3Mq2i+wHO5j06FmlCNkmKibTSZZGfRY2m9Z2q2gn3ZbWnIXmq+d33SjpHkpq3reXDROSlfVjp+cTSHqF2VPytXWDhvFw0rZEKWUUmpWWK6XGKuh4vriYzrWF2tYWKrgYLgLiBFVCZpFxE6WkCXVzBzWyJiJg4+ckKO0J7aUTuIXC6HMzOHHStqOkydVmS/T1apXl+qfYDgHhg8WStyQzJ6MB1SOCBSPxJENxI/Rh9Zl1yyX0ugckGlMBlRRx5jRSdsDxJGFRdEISNfNDiFLydiPyttKBZJORZPNRZMQBpZLRM/RCFamV7DWkicdkauTTqLcjKDWR1OHggmDAYXFQglLxFFMxRLQRdWTxxlViNvMRVDRBxcOxtRWTR2nGLIExRIfUOrWkaeTDeNDgsqEQorEgYZKA00NxNNTR1iejGWkE+zbECKWyVyiF2rpIrPxavygEOuPDWKSzaMEgooGwkrHQspOBhMXix+cTSPaj+MVDBwVipvjUCrRjOFTzuRHhU9Si5ya0OcbkeiilzFhUCmiEmuzKsTiQAAAPd0Uk5TAAEuVWFVMj1qjnwPE4Dz/////v///LoPHcT/////////11oHO+j////////9jQ4EF6L4////////yjcHeFmCLwqW///////////ZuKORsvSlClP1///////////////////4gjDk///////////////////6bijg//////////////////+BCZL5///////////////////HObv/////////////////////hq//////////////////////e3z7///////////////////lTwRy/////////////eSqf0AJAsL/////+MPApXReChCSzMaHNgsSEa/nSQEAAABZSURBVHicY2QAA0YE+MoIFuFBEnoJFpJAErnLABJSQRK5CDSEwYARFRxkdGDEAEGYQimYQmWYQh2YQrMwhdZgCu3DFLqALqDAyPAQmS8MChUGhncwPhckoACWAgyRePG1UgAAAABJRU5ErkJggg=="
+              id="c"
+              width="18"
+              height="16"
+            />
+          </defs>
+        </svg>
+        <img
+          class="main-image"
+          src="https://bkk.lol/case1.png"
+          alt="Main image"
+        />
+      </div>
     </div>
-
-    <div class="method method-4">
-        <h2>Method 4: CSS Gradient Shapes</h2>
-        <p>This method attempts to create blurred gradient shapes that imitate the original image.</p>
-        <div class="image-container">
-            <div class="gradient-backdrop"></div>
-            <img class="main-image" src="https://bkk.lol/case1.png" alt="Main image" width="300">
-        </div>
-    </div>
-</body>
+  </body>
 </html>
