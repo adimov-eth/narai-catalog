@@ -61,6 +61,28 @@
         height: 72px;
         z-index: 1;
       }
+
+      .method-4 .magic {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        background: url('https://bkk.lol/case1.png') center center / 80px 72px no-repeat;
+      }
+      .method-4 .magic::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: inherit;
+        background-position: center center;
+        background-size: 80px 72px;
+        background-repeat: no-repeat;
+        filter: blur(12px);
+        z-index: -1;  
+      }
+
     </style>
   </head>
   <body>
@@ -156,6 +178,16 @@
           alt="Main image"
         />
       </div>
+    </div>
+
+    <div class="method method-4">
+      <h2>Method 4:</h2>
+      <p>This method uses CSS pseudoelement to create a blurred copy.</p>
+      <div class="image-container">
+
+        <div class="magic">
+
+        </div>
     </div>
   </body>
 </html>
